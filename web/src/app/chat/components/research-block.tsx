@@ -1,7 +1,7 @@
 // Copyright (c) 2025 Bytedance Ltd. and/or its affiliates
 // SPDX-License-Identifier: MIT
 
-import { Check, Copy, Headphones, Pencil, Undo2, X } from "lucide-react";
+import { Check, Copy, FileText, Headphones, Pencil, Presentation, Undo2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { ScrollContainer } from "~/components/deer-flow/scroll-container";
@@ -10,7 +10,7 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useReplay } from "~/core/replay";
-import { closeResearch, listenToPodcast, useStore } from "~/core/store";
+import { closeResearch, generatePDFReport, generatePresentation, listenToPodcast, useStore } from "~/core/store";
 import { cn } from "~/lib/utils";
 
 import { ResearchActivitiesBlock } from "./research-activities-block";
@@ -45,6 +45,20 @@ export function ResearchBlock({
       return;
     }
     await listenToPodcast(researchId);
+  }, [researchId]);
+
+  const handleGeneratePPT = useCallback(async () => {
+    if (!researchId) {
+      return;
+    }
+    await generatePresentation(researchId);
+  }, [researchId]);
+
+  const handleGeneratePDF = useCallback(async () => {
+    if (!researchId) {
+      return;
+    }
+    await generatePDFReport(researchId);
   }, [researchId]);
 
   const [editing, setEditing] = useState(false);
@@ -90,6 +104,28 @@ export function ResearchBlock({
                   onClick={handleGeneratePodcast}
                 >
                   <Headphones />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Generate PowerPoint">
+                <Button
+                  className="text-gray-400 bg-blue-100"
+                  size="icon"
+                  variant="ghost"
+                  disabled={isReplay}
+                  onClick={handleGeneratePPT}
+                >
+                  <Presentation />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Generate PDF Report">
+                <Button
+                  className="text-gray-400 bg-red-100"
+                  size="icon"
+                  variant="ghost"
+                  disabled={isReplay}
+                  onClick={handleGeneratePDF}
+                >
+                  <FileText />
                 </Button>
               </Tooltip>
               <Tooltip title="Edit">

@@ -26,6 +26,11 @@ const config = {
     },
   },
 
+  // Uncomment the following lines if you encounter Turbopack font import issues
+  // experimental: {
+  //   turbopack: false, // Disable Turbopack if font issues persist
+  // },
+
   // For production mode
   webpack: (config) => {
     config.module.rules.push({

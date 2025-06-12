@@ -5,22 +5,30 @@ from langgraph.graph import END, START, StateGraph
 
 from src.ppt.graph.ppt_composer_node import ppt_composer_node
 from src.ppt.graph.ppt_generator_node import ppt_generator_node
+from src.ppt.graph.enhanced_ppt_generator import enhanced_ppt_generator_node
 from src.ppt.graph.state import PPTState
 
 
-def build_graph():
+def build_graph(use_enhanced_generator=True):
     """Build and return the ppt workflow graph."""
     # build state graph
     builder = StateGraph(PPTState)
     builder.add_node("ppt_composer", ppt_composer_node)
-    builder.add_node("ppt_generator", ppt_generator_node)
+    
+    # Choose generator based on preference
+    if use_enhanced_generator:
+        builder.add_node("ppt_generator", enhanced_ppt_generator_node)
+    else:
+        builder.add_node("ppt_generator", ppt_generator_node)
+    
     builder.add_edge(START, "ppt_composer")
     builder.add_edge("ppt_composer", "ppt_generator")
     builder.add_edge("ppt_generator", END)
     return builder.compile()
 
 
-workflow = build_graph()
+# Default to enhanced generator
+workflow = build_graph(use_enhanced_generator=True)
 
 if __name__ == "__main__":
     from dotenv import load_dotenv

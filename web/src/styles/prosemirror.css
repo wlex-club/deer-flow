@@ -12,12 +12,13 @@
 
 .prose.inline-editor .is-empty.placeholder {
   display: block;
-  opacity: 0.65;
+  color: var(--muted-foreground);
   font-size: 14px;
 }
 
 .ProseMirror {
   line-height: 1.75;
+  color: var(--foreground);
 }
 
 .ProseMirror .is-editor-empty:first-child::before {

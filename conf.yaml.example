@@ -7,3 +7,27 @@ BASIC_MODEL:
   base_url: https://ark.cn-beijing.volces.com/api/v3
   model: "doubao-1-5-pro-32k-250115"
   api_key: xxxx
+
+# [!NOTE] Eko Event-Driven Architecture Configuration
+# Eko provides event-driven capabilities for enhanced monitoring and tracking
+# Set EKO_ENABLED=true in your environment to enable these features
+
+# Eko Framework Configuration (via environment variables):
+# EKO_ENABLED=true                    # Enable/disable Eko framework
+# EKO_DEBUG=false                     # Enable debug mode for Eko
+# EKO_EVENT_STORE=memory              # Event store type: memory, redis, postgres
+# EKO_EVENT_BUS=memory                # Event bus type: memory, redis, kafka  
+# EKO_LANGGRAPH_COMPAT=true           # Enable LangGraph compatibility
+# EKO_PERSISTENCE_ENABLED=false       # Enable event persistence
+# EKO_METRICS_ENABLED=true            # Enable metrics collection
+# EKO_BATCH_SIZE=100                  # Event processing batch size
+# EKO_FLUSH_INTERVAL=1000             # Event flush interval (ms)
+# EKO_MAX_EVENTS_PER_BATCH=500        # Maximum events per batch
+# EKO_SNAPSHOT_INTERVAL=1000          # Snapshot interval for persistence
+# EKO_HEALTH_CHECK_INTERVAL=30        # Health check interval (seconds)
+# EKO_MAX_RETRY_ATTEMPTS=3            # Maximum retry attempts for failed events
+# EKO_RETRY_DELAY=1000                # Retry delay (ms)
+
+# Example: Enable Eko in development
+# EKO_ENABLED=true
+# EKO_DEBUG=true

@@ -1,3 +1,5 @@
+"use client";
+
 // Copyright (c) 2025 Bytedance Ltd. and/or its affiliates
 // SPDX-License-Identifier: MIT
 
@@ -9,6 +11,7 @@ import { useReplay } from "../replay";
 
 import { fetchReplayTitle } from "./chat";
 import { getRAGConfig } from "./rag";
+import { checkServerStatus, logServerDiagnostics } from "./server-status";
 
 export function useReplayMetadata() {
   const { isReplay } = useReplay();
@@ -46,16 +49,32 @@ export function useReplayMetadata() {
 export function useRAGProvider() {
   const [loading, setLoading] = useState(true);
   const [provider, setProvider] = useState<string | null>(null);
+  const [serverStatus, setServerStatus] = useState<"checking" | "online" | "offline">("checking");
 
   useEffect(() => {
     if (env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY) {
       setLoading(false);
+      setServerStatus("offline");
       return;
     }
-    getRAGConfig()
+
+    // First check server status
+    checkServerStatus()
+      .then((status) => {
+        logServerDiagnostics(status);
+        setServerStatus(status.isRunning ? "online" : "offline");
+        
+        if (status.isRunning) {
+          // If server is running, get RAG config
+          return getRAGConfig();
+        } else {
+          throw new Error(`Server is not running: ${status.error}`);
+        }
+      })
       .then(setProvider)
       .catch((e) => {
         setProvider(null);
+        setServerStatus("offline");
         console.error("Failed to get RAG provider", e);
       })
       .finally(() => {
@@ -63,5 +82,5 @@ export function useRAGProvider() {
       });
   }, []);
 
-  return { provider, loading };
+  return { provider, loading, serverStatus };
 }

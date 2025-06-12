@@ -173,11 +173,11 @@ const MessageInput = forwardRef<MessageInputRef, MessageInputProps>(
           <EditorContent
             immediatelyRender={false}
             extensions={extensions}
-            className="border-muted h-full w-full overflow-auto"
+            className="border-muted h-full w-full overflow-auto input-box-content"
             editorProps={{
               attributes: {
                 class:
-                  "prose prose-base dark:prose-invert inline-editor font-default focus:outline-none max-w-full",
+                  "prose prose-base prose-primary dark:prose-invert inline-editor font-default focus:outline-none max-w-full text-foreground",
               },
               transformPastedHTML: transformPastedHTML,
             }}

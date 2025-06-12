@@ -81,7 +81,7 @@ class GeneratePodcastRequest(BaseModel):
 
 
 class GeneratePPTRequest(BaseModel):
-    content: str = Field(..., description="The content of the ppt")
+    topic: str = Field(..., description="The topic for PPT generation")
 
 
 class GenerateProseRequest(BaseModel):
@@ -90,3 +90,8 @@ class GenerateProseRequest(BaseModel):
     command: Optional[str] = Field(
         "", description="The user custom command of the prose writer"
     )
+
+
+class GeneratePDFRequest(BaseModel):
+    content: str = Field(..., description="The markdown content to convert to PDF")
+    title: Optional[str] = Field("Report", description="The title of the PDF report")

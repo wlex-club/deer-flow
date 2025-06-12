@@ -32,6 +32,9 @@ dependencies = [
     "arxiv>=2.2.0",
     "mcp>=1.6.0",
     "langchain-mcp-adapters>=0.0.9",
+    "python-pptx>=1.0.2",
+    "logger>=1.4",
+    "reportlab>=4.4.1",
 ]
 
 [project.optional-dependencies]

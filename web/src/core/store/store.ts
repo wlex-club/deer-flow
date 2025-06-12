@@ -7,6 +7,8 @@ import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 
 import { chatStream, generatePodcast } from "../api";
+import { generatePDF } from "../api/pdf";
+import { generatePPT } from "../api/ppt";
 import type { Message, Resource } from "../messages";
 import { mergeMessage } from "../messages";
 import { parseJSON } from "../utils";
@@ -324,6 +326,126 @@ export async function listenToPodcast(researchId: string) {
         messages: new Map(useStore.getState().messages).set(podCastMessageId, {
           ...state.messages.get(podCastMessageId)!,
           content: JSON.stringify({ ...podcastObject, audioUrl }),
+          isStreaming: false,
+        }),
+      }));
+    }
+  }
+}
+
+export async function generatePresentation(researchId: string) {
+  const planMessageId = useStore.getState().researchPlanIds.get(researchId);
+  const reportMessageId = useStore.getState().researchReportIds.get(researchId);
+  if (planMessageId && reportMessageId) {
+    const planMessage = getMessage(planMessageId)!;
+    const title = parseJSON(planMessage.content, { title: "Untitled" }).title;
+    const reportMessage = getMessage(reportMessageId);
+    if (reportMessage?.content) {
+      appendMessage({
+        id: nanoid(),
+        threadId: THREAD_ID,
+        role: "user",
+        content: "Please generate a PowerPoint presentation for the above research.",
+        contentChunks: [],
+      });
+      const pptMessageId = nanoid();
+      const pptObject = { title, researchId };
+      const pptMessage: Message = {
+        id: pptMessageId,
+        threadId: THREAD_ID,
+        role: "assistant",
+        agent: "ppt",
+        content: JSON.stringify(pptObject),
+        contentChunks: [],
+        isStreaming: true,
+      };
+      appendMessage(pptMessage);
+      // Generating PPT...
+      let pptUrl: string | undefined;
+      try {
+        pptUrl = await generatePPT(reportMessage.content);
+      } catch (e) {
+        console.error(e);
+        useStore.setState((state) => ({
+          messages: new Map(useStore.getState().messages).set(
+            pptMessageId,
+            {
+              ...state.messages.get(pptMessageId)!,
+              content: JSON.stringify({
+                ...pptObject,
+                error: e instanceof Error ? e.message : "Unknown error",
+              }),
+              isStreaming: false,
+            },
+          ),
+        }));
+        toast("An error occurred while generating PowerPoint. Please try again.");
+        return;
+      }
+      useStore.setState((state) => ({
+        messages: new Map(useStore.getState().messages).set(pptMessageId, {
+          ...state.messages.get(pptMessageId)!,
+          content: JSON.stringify({ ...pptObject, pptUrl }),
+          isStreaming: false,
+        }),
+      }));
+    }
+  }
+}
+
+export async function generatePDFReport(researchId: string) {
+  const planMessageId = useStore.getState().researchPlanIds.get(researchId);
+  const reportMessageId = useStore.getState().researchReportIds.get(researchId);
+  if (planMessageId && reportMessageId) {
+    const planMessage = getMessage(planMessageId)!;
+    const title = parseJSON(planMessage.content, { title: "Untitled" }).title;
+    const reportMessage = getMessage(reportMessageId);
+    if (reportMessage?.content) {
+      appendMessage({
+        id: nanoid(),
+        threadId: THREAD_ID,
+        role: "user",
+        content: "Please generate a PDF report for the above research.",
+        contentChunks: [],
+      });
+      const pdfMessageId = nanoid();
+      const pdfObject = { title, researchId };
+      const pdfMessage: Message = {
+        id: pdfMessageId,
+        threadId: THREAD_ID,
+        role: "assistant",
+        agent: "pdf",
+        content: JSON.stringify(pdfObject),
+        contentChunks: [],
+        isStreaming: true,
+      };
+      appendMessage(pdfMessage);
+      // Generating PDF...
+      let pdfUrl: string | undefined;
+      try {
+        pdfUrl = await generatePDF(reportMessage.content, title);
+      } catch (e) {
+        console.error(e);
+        useStore.setState((state) => ({
+          messages: new Map(useStore.getState().messages).set(
+            pdfMessageId,
+            {
+              ...state.messages.get(pdfMessageId)!,
+              content: JSON.stringify({
+                ...pdfObject,
+                error: e instanceof Error ? e.message : "Unknown error",
+              }),
+              isStreaming: false,
+            },
+          ),
+        }));
+        toast("An error occurred while generating PDF report. Please try again.");
+        return;
+      }
+      useStore.setState((state) => ({
+        messages: new Map(useStore.getState().messages).set(pdfMessageId, {
+          ...state.messages.get(pdfMessageId)!,
+          content: JSON.stringify({ ...pdfObject, pdfUrl }),
           isStreaming: false,
         }),
       }));

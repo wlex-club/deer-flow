@@ -234,7 +234,7 @@ function AgentNode({
         />
       )}
       <Tooltip
-        className="max-w-50 text-[15px] font-light opacity-70"
+        className="max-w-50 text-[15px] font-light text-foreground"
         style={{
           ["--primary" as string]: "#333",
           ["--primary-foreground" as string]: "white",

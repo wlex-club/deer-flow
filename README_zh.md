@@ -7,6 +7,8 @@
 
 > 源于开源，回馈开源。
 
+uv run server.py --reload
+
 **DeerFlow**（**D**eep **E**xploration and **E**fficient **R**esearch **Flow**）是一个社区驱动的深度研究框架，它建立在开源社区的杰出工作基础之上。我们的目标是将语言模型与专业工具（如网络搜索、爬虫和 Python 代码执行）相结合，同时回馈使这一切成为可能的社区。
 
 请访问[DeerFlow 的官方网站](https://deerflow.tech/)了解更多详情。
@@ -49,6 +51,8 @@ https://github.com/user-attachments/assets/f3786598-1f2a-4d07-919e-8b99dfa1de3e
 ## 快速开始
 
 DeerFlow 使用 Python 开发，并配有用 Node.js 编写的 Web UI。为确保顺利的设置过程，我们推荐使用以下工具：
+
+uvicorn src.server.app:app --host 0.0.0.0 --port 8000 --reload
 
 ### 推荐工具
 

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 import { motion } from "framer-motion";
-import { FastForward, Play } from "lucide-react";
+import { FastForward, Play, Sparkles, Zap } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 
 import { RainbowText } from "~/components/deer-flow/rainbow-text";
+import { LoadingSpinner } from "~/components/magicui/loading-spinner";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -84,29 +85,55 @@ export function MessagesBlock({ className }: { className?: string }) {
     fastForwardReplay(!fastForwarding);
   }, [fastForwarding]);
   return (
-    <div className={cn("flex h-full flex-col", className)}>
-      <MessageListView
-        className="flex flex-grow"
-        onFeedback={handleFeedback}
-        onSendMessage={handleSend}
-      />
+    <div className={cn("flex h-full flex-col relative", className)}>
+      {/* Background enhancement */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30 dark:from-blue-950/20 dark:via-purple-950/10 dark:to-pink-950/20 rounded-xl opacity-60"></div>
+      
       {!isReplay ? (
-        <div className="relative flex h-42 shrink-0 pb-4">
-          {!responding && messageCount === 0 && (
+        messageCount === 0 && !responding ? (
+          /* 初始状态：显示Welcome和问题卡片 */
+          <div className="flex flex-col h-full justify-center items-center px-4 relative z-10">
             <ConversationStarter
-              className="absolute top-[-218px] left-0"
+              className="w-full max-w-4xl mb-8"
               onSend={handleSend}
             />
-          )}
-          <InputBox
-            className="h-full w-full"
-            responding={responding}
-            feedback={feedback}
-            onSend={handleSend}
-            onCancel={handleCancel}
-            onRemoveFeedback={handleRemoveFeedback}
-          />
-        </div>
+            {/* Enhanced input box with glow effect - 宽度与上面的卡片保持一致，并增加高度 */}
+            <div className="relative w-full max-w-4xl h-32">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl blur-lg opacity-50"></div>
+              <InputBox
+                className="h-full w-full relative z-10"
+                responding={responding}
+                feedback={feedback}
+                onSend={handleSend}
+                onCancel={handleCancel}
+                onRemoveFeedback={handleRemoveFeedback}
+              />
+            </div>
+          </div>
+        ) : (
+          /* 聊天状态：显示消息列表和输入框 */
+          <>
+            <MessageListView
+              className="flex flex-grow relative z-10"
+              onFeedback={handleFeedback}
+              onSendMessage={handleSend}
+            />
+            <div className="relative flex h-36 shrink-0 pb-4 z-10">
+              {/* Enhanced input box with glow effect - 增加高度保持一致 */}
+              <div className="relative w-full h-full">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl blur-lg opacity-50"></div>
+                <InputBox
+                  className="h-full w-full relative z-10"
+                  responding={responding}
+                  feedback={feedback}
+                  onSend={handleSend}
+                  onCancel={handleCancel}
+                  onRemoveFeedback={handleRemoveFeedback}
+                />
+              </div>
+            </div>
+          </>
+        )
       ) : (
         <>
           <div
@@ -118,44 +145,58 @@ export function MessagesBlock({ className }: { className?: string }) {
             <Welcome />
           </div>
           <motion.div
-            className="mb-4 h-fit w-full items-center justify-center"
+            className="mb-4 h-fit w-full items-center justify-center z-10"
             initial={{ opacity: 0, y: "20vh" }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+            {/* Enhanced card with glass morphism */}
             <Card
               className={cn(
-                "w-full transition-all duration-300",
+                "w-full transition-all duration-300 glass-effect border-2 border-white/20 dark:border-white/10 backdrop-blur-xl",
                 !replayStarted && "translate-y-[-40vh]",
+                responding && "glow-effect"
               )}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex flex-grow items-center">
+              <div className="flex items-center justify-between relative">
+                {/* Animated background pattern */}
+                {responding && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-pink-500/5 animate-pulse rounded-lg"></div>
+                )}
+                
+                <div className="flex flex-grow items-center relative z-10">
                   {responding && (
                     <motion.div
-                      className="ml-3"
+                      className="ml-3 relative"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <video
-                        // Walking deer animation, designed by @liangzhaojun. Thank you for creating it!
-                        src="/images/walking_deer.webm"
-                        autoPlay
-                        loop
-                        muted
-                        className="h-[42px] w-[42px] object-contain"
-                      />
+                      {/* Enhanced deer animation with glow */}
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-md animate-pulse"></div>
+                        <video
+                          // Walking deer animation, designed by @liangzhaojun. Thank you for creating it!
+                          src="/images/walking_deer.webm"
+                          autoPlay
+                          loop
+                          muted
+                          className="h-[42px] w-[42px] object-contain relative z-10 drop-shadow-lg"
+                        />
+                      </div>
                     </motion.div>
                   )}
                   <CardHeader className={cn("flex-grow", responding && "pl-3")}>
-                    <CardTitle>
+                    <CardTitle className="flex items-center gap-2">
                       <RainbowText animated={responding}>
                         {responding ? "Replaying" : `${replayTitle}`}
                       </RainbowText>
+                      {responding && (
+                        <LoadingSpinner size="sm" variant="dots" />
+                      )}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="flex items-center gap-2">
                       <RainbowText animated={responding}>
                         {responding
                           ? "DeerFlow is now replaying the conversation..."
@@ -163,24 +204,36 @@ export function MessagesBlock({ className }: { className?: string }) {
                             ? "The replay has been stopped."
                             : `You're now in DeerFlow's replay mode. Click the "Play" button on the right to start.`}
                       </RainbowText>
+                      {!responding && !replayStarted && (
+                        <Sparkles className="w-4 h-4 text-blue-500 animate-pulse" />
+                      )}
                     </CardDescription>
                   </CardHeader>
                 </div>
                 {!replayHasError && (
-                  <div className="pr-4">
+                  <div className="pr-4 relative z-10">
                     {responding && (
                       <Button
-                        className={cn(fastForwarding && "animate-pulse")}
+                        className={cn(
+                          "hover-lift transition-all duration-300 group",
+                          fastForwarding && "animate-pulse bg-gradient-to-r from-blue-500 to-purple-500"
+                        )}
                         variant={fastForwarding ? "default" : "outline"}
                         onClick={handleFastForwardReplay}
                       >
-                        <FastForward size={16} />
+                        <Zap className={cn("w-4 h-4 mr-2", fastForwarding && "animate-bounce")} />
                         Fast Forward
+                        {fastForwarding && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-md blur-sm animate-pulse"></div>
+                        )}
                       </Button>
                     )}
                     {!replayStarted && (
-                      <Button className="w-24" onClick={handleStartReplay}>
-                        <Play size={16} />
+                      <Button 
+                        className="w-24 hover-lift bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 transition-all duration-300 group"
+                        onClick={handleStartReplay}
+                      >
+                        <Play className="w-4 h-4 mr-1 group-hover:animate-pulse" />
                         Play
                       </Button>
                     )}
@@ -189,18 +242,19 @@ export function MessagesBlock({ className }: { className?: string }) {
               </div>
             </Card>
             {!replayStarted && env.NEXT_PUBLIC_STATIC_WEBSITE_ONLY && (
-              <div className="text-muted-foreground w-full text-center text-xs">
-                * This site is for demo purposes only. If you want to try your
+              <div className="text-muted-foreground w-full text-center text-xs mt-4 p-3 bg-white/5 dark:bg-black/10 backdrop-blur-sm rounded-lg border border-white/10">
+                <Sparkles className="w-3 h-3 inline mr-1 text-yellow-500" />
+                This site is for demo purposes only. If you want to try your
                 own question, please{" "}
                 <a
-                  className="underline"
+                  className="underline hover:text-blue-500 transition-colors duration-200"
                   href="https://github.com/bytedance/deer-flow"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  click here
-                </a>{" "}
-                to clone it locally and run it.
+                  visit our GitHub repository
+                </a>
+                .
               </div>
             )}
           </motion.div>

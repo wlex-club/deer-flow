@@ -201,6 +201,28 @@ SEARCH_API=tavily
      RAGFLOW_RETRIEVAL_SIZE=10
   ```
 
+- 📁 **File Management & Organization**
+
+  - **Structured Output Directory**: Automatic organization of generated files into categorized folders
+  - **Smart File Naming**: Timestamp-based naming with automatic title extraction
+  - **Cleanup Tools**: Automated temporary file management and storage optimization
+  - **Backup System**: One-click backup of all generated content
+  - **Cross-Platform Tools**: Both command-line and GUI tools for Windows users
+
+  ```bash
+  # Organize existing files into structured directories
+  python scripts/cleanup.py --organize
+  
+  # View storage statistics
+  python scripts/cleanup.py --stats
+  
+  # Create backup of all outputs
+  python scripts/cleanup.py --backup
+  
+  # Windows users: Use the GUI tool
+  cleanup_and_optimize.bat
+  ```
+
 - 🔗 **MCP Seamless Integration**
   - Expand capabilities for private domain access, knowledge graph, web browsing and more
   - Facilitates integration of diverse research tools and methodologies
@@ -568,3 +590,194 @@ Your unwavering commitment and expertise have been the driving force behind Deer
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=bytedance/deer-flow&type=Date)](https://star-history.com/#bytedance/deer-flow&Date)
+
+## ✨ Features
+
+- **Multi-Agent Research System**: Coordinated team of specialized AI agents
+- **📊 Event-Driven Architecture**: Built-in Eko framework for real-time monitoring and tracking
+- **🔍 Background Investigation**: Automatic web search and context enhancement
+- **📈 Interactive Planning**: Human-in-the-loop plan approval and modification
+- **🎯 Multi-Modal Output**: Generate reports, presentations, podcasts, and prose
+- **🔌 Extensible Tools**: RAG integration, MCP server support
+- **🌐 Modern Web Interface**: React-based frontend with real-time streaming
+
+## 🏗️ Architecture Modes
+
+DeerFlow supports two operational modes:
+
+### 🚀 **Eko Enhanced Mode** (Recommended)
+- **Event-Driven Architecture**: Real-time event tracking and monitoring
+- **Task Lifecycle Management**: Complete visibility into research workflows
+- **Performance Metrics**: Built-in analytics and monitoring
+- **Event Sourcing**: Full audit trail of all operations
+- **API Monitoring**: Dedicated endpoints for system observability
+
+### 🔧 **Traditional Mode**
+- **Standard LangGraph**: Classic workflow execution
+- **Lightweight**: Minimal overhead for simple use cases
+- **Backward Compatible**: Works with existing configurations
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Node.js 18+ (for frontend)
+- API keys for your chosen LLM provider
+
+### Backend Setup
+
+#### Option 1: Start with Eko Framework (Recommended)
+```bash
+# Windows
+start-eko.bat
+
+# Or using PowerShell with Eko
+.\start-backend.ps1 -Eko
+
+# Or using environment variables
+set EKO_ENABLED=true
+python -m uvicorn src.server:app --reload
+```
+
+#### Option 2: Traditional Mode
+```bash
+# Windows
+start-backend.bat
+
+# Or using PowerShell
+.\start-backend.ps1
+
+# Or directly
+python -m uvicorn src.server:app --reload
+```
+
+### Frontend Setup
+```bash
+cd web
+npm install
+npm run dev
+```
+
+### Command Line Usage
+```bash
+# Traditional mode
+python main.py --interactive
+
+# With Eko enabled
+set EKO_ENABLED=true
+python main.py --interactive
+```
+
+## 🎯 Eko Framework Features
+
+When Eko is enabled, you get access to:
+
+### **📊 Real-time Monitoring**
+- Task lifecycle tracking
+- Agent coordination monitoring  
+- Event stream visualization
+- Performance metrics collection
+
+### **🔍 Event API Endpoints**
+- `GET /api/eko/status` - Framework status and configuration
+- `GET /api/eko/events/{thread_id}` - Event history for specific tasks
+- `GET /api/eko/metrics` - System-wide metrics and analytics
+
+### **⚙️ Configuration Options**
+```bash
+# Environment Variables
+EKO_ENABLED=true                    # Enable/disable Eko framework
+EKO_DEBUG=false                     # Debug mode for detailed logging
+EKO_EVENT_STORE=memory              # Event storage: memory, redis, postgres
+EKO_EVENT_BUS=memory                # Event bus: memory, redis, kafka
+EKO_LANGGRAPH_COMPAT=true           # LangGraph compatibility mode
+EKO_METRICS_ENABLED=true            # Enable metrics collection
+EKO_PERSISTENCE_ENABLED=false       # Enable event persistence
+```
+
+### **📈 Event Types Supported**
+- `research.task.created` - Research task initiation
+- `research.task.updated` - Task progress updates
+- `research.task.completed` - Task completion
+- `agent.started` - Agent execution start
+- `agent.completed` - Agent execution completion
+- `search.completed` - Search operation results
+- `content.processed` - Content analysis completion
+
+## 📝 Configuration
+
+### Basic Configuration
+Copy `conf.yaml.example` to `conf.yaml` and configure your LLM settings:
+
+```yaml
+BASIC_MODEL:
+  base_url: https://api.openai.com/v1
+  model: "gpt-4"
+  api_key: "your-api-key"
+```
+
+### Eko Configuration
+Set environment variables to enable and configure Eko:
+
+```bash
+# Enable Eko with debug mode
+EKO_ENABLED=true
+EKO_DEBUG=true
+
+# Configure event storage (future)
+EKO_EVENT_STORE=memory
+EKO_EVENT_BUS=memory
+```
+
+## 🔧 Development
+
+### Architecture Overview
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Frontend      │────│   API Server     │────│   Eko Events    │
+│   (React)       │    │   (FastAPI)      │    │   (Optional)    │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                                │
+                       ┌──────────────────┐
+                       │   LangGraph      │
+                       │   Workflow       │
+                       └──────────────────┘
+```
+
+### Key Components
+- **Graph Builder**: Creates workflow graphs with optional Eko enhancement
+- **Event System**: Captures and processes workflow events
+- **API Layer**: Provides REST endpoints for frontend integration
+- **Agent Nodes**: Specialized AI agents for different tasks
+
+### Running Tests
+```bash
+# Test Eko integration
+python scripts/test_eko_integration.py
+
+# Run specific agent tests
+python -m pytest tests/
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with both Traditional and Eko modes
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with LangGraph for workflow orchestration
+- Eko framework for event-driven architecture
+- FastAPI for high-performance API server
+- React for modern web interface
+
+---
+
+> "Originated from Open Source, give back to Open Source."

@@ -8,6 +8,8 @@ import { Geist } from "next/font/google";
 import Script from "next/script";
 
 import { ThemeProviderWrapper } from "~/components/deer-flow/theme-provider-wrapper";
+import { ServerStatusIndicator } from "~/components/server-status-indicator";
+import { TextReadabilityEnhancer } from "~/components/text-readability-enhancer";
 import { env } from "~/env";
 
 import { Toaster } from "../components/deer-flow/toaster";
@@ -22,6 +24,7 @@ export const metadata: Metadata = {
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
+  display: "swap",
 });
 
 export default function RootLayout({
@@ -43,8 +46,11 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="bg-app">
-        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
-        <Toaster />
+        <TextReadabilityEnhancer>
+          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+          <Toaster />
+          <ServerStatusIndicator />
+        </TextReadabilityEnhancer>
         {
           // NO USER BEHAVIOR TRACKING OR PRIVATE DATA COLLECTION BY DEFAULT
           //

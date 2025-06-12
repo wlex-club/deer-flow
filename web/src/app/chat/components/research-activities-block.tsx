@@ -216,7 +216,7 @@ function WebSearchToolCall({ toolCall }: { toolCall: ToolCallRuntime }) {
                 }}
               >
                 <a
-                  className="flex flex-col gap-2 overflow-hidden rounded-md opacity-75 transition-opacity duration-300 hover:opacity-100"
+                  className="flex flex-col gap-2 overflow-hidden rounded-md transition-opacity duration-300 hover:scale-105"
                   href={searchResult.image_url}
                   target="_blank"
                 >

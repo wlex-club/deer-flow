@@ -43,7 +43,7 @@ const BentoCard = ({
   <div
     key={name}
     className={cn(
-      "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
+      "group relative flex flex-col justify-between overflow-hidden rounded-xl min-h-[200px] h-full",
       // light styles
       "bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
       // dark styles
@@ -52,32 +52,27 @@ const BentoCard = ({
     )}
     {...props}
   >
-    {background && <div>{background}</div>}
+    {background && <div className="absolute inset-0">{background}</div>}
     <a
-      className="z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300 group-hover:-translate-y-5"
+      className="relative z-10 flex flex-col gap-3 p-6 h-full transition-all duration-300"
       href={href}
       target="_blank"
     >
-      <Icon className="h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-60" />
-      <h3 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300">
-        {name}
-      </h3>
-      <p className="max-w-lg text-neutral-400">{description}</p>
-    </a>
-
-    <div
-      className={cn(
-        "pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100",
-      )}
-    >
-      <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
-        <a href={href}>
+      <Icon className="h-8 w-8 text-neutral-700 dark:text-neutral-300 transition-all duration-300 ease-in-out group-hover:scale-110" />
+      <div className="flex-1 space-y-2">
+        <h3 className="text-base font-semibold text-neutral-700 dark:text-neutral-300 line-clamp-2">
+          {name}
+        </h3>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-3">{description}</p>
+      </div>
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Button variant="ghost" size="sm" className="text-xs h-8 px-3">
           {cta}
-          <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-        </a>
-      </Button>
-    </div>
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
+          <ArrowRightIcon className="ms-1 h-3 w-3 rtl:rotate-180" />
+        </Button>
+      </div>
+    </a>
+    <div className="pointer-events-none absolute inset-0 transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
   </div>
 );
 

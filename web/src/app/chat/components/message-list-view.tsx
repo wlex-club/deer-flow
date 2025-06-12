@@ -3,7 +3,7 @@
 
 import { LoadingOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
-import { Download, Headphones } from "lucide-react";
+import { Download, FileText, Headphones, Presentation } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { LoadingAnimation } from "~/components/deer-flow/loading-animation";
@@ -133,6 +133,7 @@ function MessageListItem({
       message.agent === "coordinator" ||
       message.agent === "planner" ||
       message.agent === "podcast" ||
+      message.agent === "ppt" ||
       startOfResearch
     ) {
       let content: React.ReactNode;
@@ -152,6 +153,18 @@ function MessageListItem({
         content = (
           <div className="w-full px-4">
             <PodcastCard message={message} />
+          </div>
+        );
+      } else if (message.agent === "ppt") {
+        content = (
+          <div className="w-full px-4">
+            <PPTCard message={message} />
+          </div>
+        );
+      } else if (message.agent === "pdf") {
+        content = (
+          <div className="w-full px-4">
+            <PDFCard message={message} />
           </div>
         );
       } else if (startOfResearch) {
@@ -176,8 +189,8 @@ function MessageListItem({
               <div className="flex w-full flex-col text-wrap break-words">
                 <Markdown
                   className={cn(
-                    message.role === "user" &&
-                      "prose-invert not-dark:text-secondary dark:text-inherit",
+                    "text-foreground prose-primary dark:prose-invert message-content",
+                    message.role === "user" && "prose-invert text-white dark:text-white"
                   )}
                 >
                   {message?.content}
@@ -221,9 +234,9 @@ function MessageBubble({
   return (
     <div
       className={cn(
-        `group flex w-fit max-w-[85%] flex-col rounded-2xl px-4 py-3 text-nowrap shadow`,
-        message.role === "user" && "bg-brand rounded-ee-none",
-        message.role === "assistant" && "bg-card rounded-es-none",
+        `group flex w-fit max-w-[85%] flex-col rounded-2xl px-4 py-3 text-nowrap shadow-lg message-bubble`,
+        message.role === "user" && "user-bubble user-message rounded-ee-none",
+        message.role === "assistant" && "assistant-bubble assistant-message rounded-es-none",
         className,
       )}
     >
@@ -344,7 +357,7 @@ function PlanCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Markdown className="opacity-80" animated>
+        <Markdown className="text-muted-foreground" animated>
           {plan.thought}
         </Markdown>
         {plan.steps && (
@@ -464,6 +477,146 @@ function PodcastCard({
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
           />
+        ) : (
+          <div className="w-full"></div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PPTCard({
+  className,
+  message,
+}: {
+  className?: string;
+  message: Message;
+}) {
+  const data = useMemo(() => {
+    return JSON.parse(message.content ?? "");
+  }, [message.content]);
+  const title = useMemo<string | undefined>(() => data?.title, [data]);
+  const pptUrl = useMemo<string | undefined>(() => data?.pptUrl, [data]);
+  const isGenerating = useMemo(() => {
+    return message.isStreaming;
+  }, [message.isStreaming]);
+  const hasError = useMemo(() => {
+    return data?.error !== undefined;
+  }, [data]);
+  return (
+    <Card className={cn("w-[508px]", className)}>
+      <CardHeader>
+        <div className="text-muted-foreground flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            {isGenerating ? <LoadingOutlined /> : <Presentation size={16} />}
+            {!hasError ? (
+              <RainbowText animated={isGenerating}>
+                {isGenerating
+                  ? "Generating PowerPoint..."
+                  : "PowerPoint Presentation"}
+              </RainbowText>
+            ) : (
+              <div className="text-red-500">
+                Error when generating PowerPoint. Please try again.
+              </div>
+            )}
+          </div>
+          {!hasError && !isGenerating && (
+            <div className="flex">
+              <Tooltip title="Download PowerPoint">
+                <Button variant="ghost" size="icon" asChild>
+                  <a
+                    href={pptUrl}
+                    download={`${(title ?? "presentation").replaceAll(" ", "-")}.pptx`}
+                  >
+                    <Download size={16} />
+                  </a>
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
+        <CardTitle>
+          <div className="text-lg font-medium">
+            <RainbowText animated={isGenerating}>{title}</RainbowText>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {pptUrl && !isGenerating ? (
+          <div className="text-muted-foreground text-sm">
+            PowerPoint presentation has been generated successfully. Click the download button above to save it.
+          </div>
+        ) : (
+          <div className="w-full"></div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PDFCard({
+  className,
+  message,
+}: {
+  className?: string;
+  message: Message;
+}) {
+  const data = useMemo(() => {
+    return JSON.parse(message.content ?? "");
+  }, [message.content]);
+  const title = useMemo<string | undefined>(() => data?.title, [data]);
+  const pdfUrl = useMemo<string | undefined>(() => data?.pdfUrl, [data]);
+  const isGenerating = useMemo(() => {
+    return message.isStreaming;
+  }, [message.isStreaming]);
+  const hasError = useMemo(() => {
+    return data?.error !== undefined;
+  }, [data]);
+  return (
+    <Card className={cn("w-[508px]", className)}>
+      <CardHeader>
+        <div className="text-muted-foreground flex items-center justify-between text-sm">
+          <div className="flex items-center gap-2">
+            {isGenerating ? <LoadingOutlined /> : <FileText size={16} />}
+            {!hasError ? (
+              <RainbowText animated={isGenerating}>
+                {isGenerating
+                  ? "Generating PDF Report..."
+                  : "PDF Report"}
+              </RainbowText>
+            ) : (
+              <div className="text-red-500">
+                Error when generating PDF report. Please try again.
+              </div>
+            )}
+          </div>
+          {!hasError && !isGenerating && (
+            <div className="flex">
+              <Tooltip title="Download PDF Report">
+                <Button variant="ghost" size="icon" asChild>
+                  <a
+                    href={pdfUrl}
+                    download={`${(title ?? "report").replaceAll(" ", "-")}.pdf`}
+                  >
+                    <Download size={16} />
+                  </a>
+                </Button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
+        <CardTitle>
+          <div className="text-lg font-medium">
+            <RainbowText animated={isGenerating}>{title}</RainbowText>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {pdfUrl && !isGenerating ? (
+          <div className="text-muted-foreground text-sm">
+            PDF report has been generated successfully. Click the download button above to save it.
+          </div>
         ) : (
           <div className="w-full"></div>
         )}

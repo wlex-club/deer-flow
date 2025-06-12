@@ -21,15 +21,14 @@ export function ConversationStarter({
   onSend?: (message: string) => void;
 }) {
   return (
-    <div className={cn("flex flex-col items-center", className)}>
-      <div className="pointer-events-none fixed inset-0 flex items-center justify-center">
-        <Welcome className="pointer-events-auto mb-15 w-[75%] -translate-y-24" />
-      </div>
-      <ul className="flex flex-wrap">
+    <div className={cn("flex flex-col items-center space-y-6 w-full", className)}>
+      <Welcome className="w-full max-w-3xl" />
+      <div className="w-full">
+        <ul className="flex flex-wrap gap-4">
         {questions.map((question, index) => (
           <motion.li
             key={question}
-            className="flex w-1/2 shrink-0 p-2 active:scale-105"
+            className="flex w-[calc(50%-8px)] shrink-0 active:scale-105"
             style={{ transition: "all 0.2s ease-out" }}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -41,7 +40,7 @@ export function ConversationStarter({
             }}
           >
             <div
-              className="bg-card text-muted-foreground cursor-pointer rounded-2xl border px-4 py-4 opacity-75 transition-all duration-300 hover:opacity-100 hover:shadow-md"
+              className="bg-card text-foreground cursor-pointer rounded-2xl border px-4 py-4 transition-all duration-300 hover:bg-accent hover:shadow-lg shadow-sm w-full"
               onClick={() => {
                 onSend?.(question);
               }}
@@ -50,7 +49,8 @@ export function ConversationStarter({
             </div>
           </motion.li>
         ))}
-      </ul>
+        </ul>
+      </div>
     </div>
   );
 }
