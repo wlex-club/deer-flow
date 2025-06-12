@@ -15,6 +15,7 @@ from fastapi.responses import Response, StreamingResponse
 from langchain_core.messages import AIMessageChunk, ToolMessage, BaseMessage
 from langgraph.types import Command
 
+from src.config.report_style import ReportStyle
 from src.config.tools import SELECTED_RAG_PROVIDER
 from src.graph.builder import build_graph_with_memory, get_eko_components
 from src.podcast.graph.builder import build_graph as build_podcast_graph
@@ -36,11 +37,13 @@ except ImportError as e:
     def generate_report_pdf(content, title):
         raise ImportError("PDF functionality requires reportlab. Install with: pip install reportlab")
 from src.prose.graph.builder import build_graph as build_prose_graph
+from src.prompt_enhancer.graph.builder import build_graph as build_prompt_enhancer_graph
 from src.rag.builder import build_retriever
 from src.rag.retriever import Resource
 from src.server.chat_request import (
     ChatMessage,
     ChatRequest,
+    EnhancePromptRequest,
     GeneratePodcastRequest,
     GeneratePPTRequest,
     GenerateProseRequest,
@@ -130,13 +133,14 @@ async def chat_stream(request: ChatRequest):
             request.interrupt_feedback,
             request.mcp_settings,
             request.enable_background_investigation,
+            request.report_style,
         ),
         media_type="text/event-stream",
     )
 
 
 async def _astream_workflow_generator(
-    messages: List[ChatMessage],
+    messages: List[dict],
     thread_id: str,
     resources: List[Resource],
     max_plan_iterations: int,
@@ -145,7 +149,8 @@ async def _astream_workflow_generator(
     auto_accepted_plan: bool,
     interrupt_feedback: str,
     mcp_settings: dict,
-    enable_background_investigation,
+    enable_background_investigation: bool,
+    report_style: ReportStyle,
 ):
     input_ = {
         "messages": messages,
@@ -155,6 +160,7 @@ async def _astream_workflow_generator(
         "observations": [],
         "auto_accepted_plan": auto_accepted_plan,
         "enable_background_investigation": enable_background_investigation,
+        "research_topic": messages[-1]["content"] if messages else "",
     }
     if not auto_accepted_plan and interrupt_feedback:
         resume_msg = f"[{interrupt_feedback}]"
@@ -175,6 +181,7 @@ async def _astream_workflow_generator(
             "max_step_num": max_step_num,
             "max_search_results": max_search_results,
             "mcp_settings": mcp_settings,
+            "report_style": report_style.value,
         },
         stream_mode=["messages", "updates"],
         subgraphs=True,
@@ -489,13 +496,24 @@ async def generate_prose(request: GenerateProseRequest):
         ) from e
 
 
+@app.get("/api/pdf/status")
+async def pdf_status():
+    """Get PDF generation status."""
+    return {
+        "available": PDF_AVAILABLE,
+        "reportlab_version": None if not PDF_AVAILABLE else "4.4.1"
+    }
+
+
 @app.post("/api/pdf/generate")
 async def generate_pdf_report(request: GeneratePDFRequest):
     """Generate PDF report from markdown content."""
     try:
         logger.info(f"Generating PDF report: {request.title}")
+        logger.info(f"PDF_AVAILABLE status: {PDF_AVAILABLE}")
         
         if not PDF_AVAILABLE:
+            logger.error(f"PDF generation unavailable, PDF_AVAILABLE={PDF_AVAILABLE}")
             raise HTTPException(
                 status_code=503,
                 detail="PDF generation unavailable. Missing dependency: reportlab. Install with: pip install reportlab"
@@ -552,6 +570,50 @@ async def generate_pdf_report(request: GeneratePDFRequest):
         raise HTTPException(
             status_code=500, detail=INTERNAL_SERVER_ERROR_DETAIL
         ) from e
+
+
+@app.post("/api/prompt/enhance")
+async def enhance_prompt(request: EnhancePromptRequest):
+    try:
+        sanitized_prompt = request.prompt.replace("\r\n", "").replace("\n", "")
+        logger.info(f"Enhancing prompt: {sanitized_prompt}")
+
+        # Convert string report_style to ReportStyle enum
+        report_style = None
+        if request.report_style:
+            try:
+                # Handle both uppercase and lowercase input
+                style_mapping = {
+                    "ACADEMIC": ReportStyle.ACADEMIC,
+                    "POPULAR_SCIENCE": ReportStyle.POPULAR_SCIENCE,
+                    "NEWS": ReportStyle.NEWS,
+                    "SOCIAL_MEDIA": ReportStyle.SOCIAL_MEDIA,
+                    "academic": ReportStyle.ACADEMIC,
+                    "popular_science": ReportStyle.POPULAR_SCIENCE,
+                    "news": ReportStyle.NEWS,
+                    "social_media": ReportStyle.SOCIAL_MEDIA,
+                }
+                report_style = style_mapping.get(
+                    request.report_style, ReportStyle.ACADEMIC
+                )
+            except Exception:
+                # If invalid style, default to ACADEMIC
+                report_style = ReportStyle.ACADEMIC
+        else:
+            report_style = ReportStyle.ACADEMIC
+
+        workflow = build_prompt_enhancer_graph()
+        final_state = workflow.invoke(
+            {
+                "prompt": request.prompt,
+                "context": request.context,
+                "report_style": report_style,
+            }
+        )
+        return {"result": final_state["output"]}
+    except Exception as e:
+        logger.exception(f"Error occurred during prompt enhancement: {str(e)}")
+        raise HTTPException(status_code=500, detail=INTERNAL_SERVER_ERROR_DETAIL)
 
 
 @app.post("/api/mcp/server/metadata", response_model=MCPServerMetadataResponse)

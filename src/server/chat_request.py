@@ -6,6 +6,7 @@ from typing import List, Optional, Union
 from pydantic import BaseModel, Field
 
 from src.rag.retriever import Resource
+from src.config.report_style import ReportStyle
 
 
 class ContentItem(BaseModel):
@@ -58,6 +59,9 @@ class ChatRequest(BaseModel):
     enable_background_investigation: Optional[bool] = Field(
         True, description="Whether to get background investigation before plan"
     )
+    report_style: Optional[ReportStyle] = Field(
+        ReportStyle.ACADEMIC, description="The style of the report"
+    )
 
 
 class TTSRequest(BaseModel):
@@ -95,3 +99,13 @@ class GenerateProseRequest(BaseModel):
 class GeneratePDFRequest(BaseModel):
     content: str = Field(..., description="The markdown content to convert to PDF")
     title: Optional[str] = Field("Report", description="The title of the PDF report")
+
+
+class EnhancePromptRequest(BaseModel):
+    prompt: str = Field(..., description="The original prompt to enhance")
+    context: Optional[str] = Field(
+        "", description="Additional context about the intended use"
+    )
+    report_style: Optional[str] = Field(
+        "academic", description="The style of the report"
+    )
