@@ -19,6 +19,7 @@ export interface Message {
   isStreaming?: boolean;
   content: string;
   contentChunks: string[];
+  reasoningContent?: string;
   toolCalls?: ToolCallRuntime[];
   options?: Option[];
   finishReason?: "stop" | "interrupt" | "tool_calls";
