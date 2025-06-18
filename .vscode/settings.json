@@ -1,0 +1,45 @@
+{
+    "editor.fontLigatures": false,
+    
+    // 全局缩放级别（简单有效的方法）
+    "window.zoomLevel": 0.5,
+    // 使用 Custom UI Style 扩展 - 左侧栏字体大小设置
+    "custom-ui-style.stylesheet": {
+        // 活动栏字体大小
+        ".monaco-workbench .activitybar .content": "font-size: 18px !important;",
+        
+        // 资源管理器整体
+        ".monaco-workbench .monaco-pane-view": "font-size: 16px !important;",
+        ".monaco-workbench .part.sidebar": "font-size: 16px !important;",
+        
+        // 文件树
+        ".monaco-list .monaco-list-row": "font-size: 16px !important;",
+        ".monaco-tree .monaco-tree-row": "font-size: 16px !important;",
+        ".monaco-tree .monaco-tree-row .content": "font-size: 16px !important;",
+        ".monaco-list .list-item": "font-size: 16px !important;",
+        
+        // 文件夹和文件名
+        ".monaco-icon-label .monaco-icon-label-description-container": "font-size: 16px !important;",
+        ".monaco-icon-label": "font-size: 16px !important;",
+        
+        // 侧边栏标题
+        ".monaco-pane-view .pane > .pane-header h3.title": "font-size: 15px !important;",
+        ".monaco-pane-view .pane > .pane-header h3": "font-weight: 600; font-size: 15px !important;",
+        
+        // 面包屑导航
+        ".monaco-breadcrumbs": "font-size: 15px !important;",
+        
+        // 搜索框
+        ".monaco-workbench .search-view .search-widget .search-container .monaco-inputbox": "font-size: 15px !important;",
+        
+        // 状态栏
+        ".monaco-workbench .part.statusbar": "font-size: 15px !important;",
+        
+        // Explorer 视图
+        ".explorer-folders-view": "font-size: 16px !important;",
+        ".explorer-item": "font-size: 16px !important;"
+    },
+    
+    // 启用webview样式（如果需要）
+    "custom-ui-style.webview.enable": false
+}
